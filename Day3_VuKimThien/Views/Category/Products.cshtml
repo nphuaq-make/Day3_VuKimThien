@@ -1,0 +1,74 @@
+﻿@model IEnumerable<Day3_VuKimThien.Models.Product>
+
+@{
+    ViewData["Title"] = "Products";
+}
+
+<h1>Products of Category: @ViewBag.CategoryName</h1>
+
+<p>
+    <a asp-controller="Category"
+       asp-action="Index">
+        Back to Categories
+    </a>
+</p>
+
+@if (!Model.Any())
+{
+    <p>This category does not have any products.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.Id)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Name)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Price)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Description)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.CategoryId)
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(model => item.Id)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(model => item.Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(model => item.Price)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(model => item.Description)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(model => item.CategoryId)
+                    </td>
+                    <td>
+                        <a asp-controller="Product"
+                           asp-action="Details"
+                           asp-route-id="@item.Id">
+                            Details
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

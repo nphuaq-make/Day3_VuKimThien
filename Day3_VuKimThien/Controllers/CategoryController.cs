@@ -7,20 +7,48 @@ namespace Day3_VuKimThien.Controllers
 {
     public class CategoryController : Controller
     {
-         //GET: CategoryController1
-        public ActionResult Index()
+        private readonly ILogger<CategoryController> _logger;
+        //public CategoryController(ILogger<CategoryController> logger)
+        public CategoryController(ILogger<CategoryController> logger)
         {
-            var _categories = SeedData.categories;
-            return View(_categories);
+            _logger = logger;
+        }
+        //GET: CategoryController1
+        public ActionResult Index(int page = 1)
+        {
+            int pageSize = 5;
+
+            // Tổng số Category
+            int totalCategories = SeedData.categories.Count;
+
+            // Tổng số trang
+            int totalPages = (int)Math.Ceiling((double)totalCategories / pageSize);
+
+            // Đảm bảo page hợp lệ
+            page = Math.Max(1, Math.Min(page, Math.Max(1, totalPages)));
+
+            // Lấy danh sách Category theo trang
+            var categories = SeedData.categories
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            // Truyền thông tin phân trang sang View
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = totalPages;
+
+            return View(categories);
         }
 
         // GET: CategoyController1/Details/5
         public ActionResult Details(int id)
         {
+            _logger.LogInformation("loi : {Id}", id);
+            _logger.LogError("loi tiep : {Id}", id);
             //lay ra category co id truyen vao tu SeedData
             var category = SeedData.categories.FirstOrDefault(c => c.Id == id);
             //New category == null thi tra ve trang loi
-            if(category == null)
+            if (category == null)
             {
                 return NotFound();
             }
@@ -46,7 +74,7 @@ namespace Day3_VuKimThien.Controllers
                 int maxId = SeedData.categories.Max(c => c.Id);
 
                 //set id cho category
-                category.Id = maxId+1;
+                category.Id = maxId + 1;
                 //Them category vao danh sach SeedData.categories
                 SeedData.categories.Add(category);
                 return RedirectToAction(nameof(Index));
@@ -119,6 +147,28 @@ namespace Day3_VuKimThien.Controllers
             {
                 return View();
             }
+        }
+
+        // GET: Category/Products/5
+        public ActionResult Products(int id)
+        {
+            // Tìm Category theo id
+            var category = SeedData.categories
+                .FirstOrDefault(c => c.Id == id);
+
+            if (category == null)
+            {
+                return NotFound();
+            }
+
+            // Lấy tất cả Product thuộc Category này
+            var products = SeedData.Products
+                .Where(p => p.CategoryId == id)
+                .ToList();
+
+            ViewBag.CategoryName = category.Name;
+
+            return View(products);
         }
     }
 }
